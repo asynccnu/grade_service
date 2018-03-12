@@ -25,3 +25,4 @@ pyparsing==2.2.0
 six==1.10.0
 wcwidth==0.1.7
 yarl==0.10.1
+redis
