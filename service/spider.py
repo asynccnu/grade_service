@@ -35,18 +35,18 @@ async def get_grade_perpage(s, sid, ip, xnm, xqm, payload):
                 _gradeList = json_data.get('items')
                 for _ in _gradeList:
                     grade = {
-                        'course'  : _.get('kcmc'),
+                        'course'  : _.get('kcmc'),#课程名
                         'credit'  : _.get('xf'),
                         'grade'   : _.get('cj'),
                         'category': _.get('kclbmc'),
                         'type'    : _.get('kcgsmc'),
-                        'jxb_id'  : _.get('jxb_id'),
+                        'jxb_id'  : _.get('jxb_id'),#514C496E56E25636E0531D50A8C0F546,不知道这一项是干什么的？？？
                         'kcxzmc'  : _.get('kcxzmc')
                     }
                     if xqm == "":
                         _xqm = _.get('xqm')
                     else: _xqm = xqm
-                    await get_grade_detail(session, sid, xnm, _xqm, grade)
+                    await get_grade_detail(session, sid, xnm, _xqm, grade) 
                     gradeList.append(grade)
                 return gradeList
             except aiohttp.client_exceptions.ClientResponseError:
