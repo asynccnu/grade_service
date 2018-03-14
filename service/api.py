@@ -4,7 +4,7 @@ from aiohttp import web
 from aiohttp.web import Response
 from .spider import get_grade
 from .decorator import require_info_login
-from .redis import redis_client
+from ._redis import redis_client
 
 api = web.Application()
 
@@ -39,12 +39,15 @@ async def grade_all_api(request, s, sid, ip):
                 return Response(
                     body=b'', content_type='application/json', status=403)
         else:
+            print("ppapppapap")
             key = sid + "_" + xnm + "_" + xqm
             val = redis_client.get(key)
             if val is not None:
                 return web.json_response(json.loads(val))
             else:
+                print("pspsppsppa")
                 gradeList = await get_grade(s, sid, ip, xnm, xqm)
+                print(gradeList)
                 if gradeList:
                     redis_client.set(
                         key, json.dumps(gradeList), ex=126144000)  #过期时间为4年
