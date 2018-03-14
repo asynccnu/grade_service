@@ -22,39 +22,37 @@ async def grade_all_api(request, s, sid, ip):
             keys.append(_.split('=')[0])
             vals.append(_.split('=')[1])
         args = dict(zip(keys, vals))
-        #xqm:第一学期３，第二学期12,第三学期16
-        #xnm: 学年 2016,2017...
-        xnm = args.get('xnm')
-        xqm = args.get('xqm')
-        if (int(xnm) + 1 == current_year and xqm == "3"
-                and datetime.date(current_year, 1, 15) < current_date <
-                datetime.date(current_year, 2, 28)) or (
-                    int(xnm) + 1 == current_year and xqm != "3"
-                    and datetime.date(current_year, 6, 1) < current_date <
-                    datetime.date(current_year, 9, 1)):
+        xnm = args.get('xnm')  # xnm: 学年 2016,2017...
+        xqm = args.get('xqm')  # xqm:第一学期3，第二学期12,第三学期16
+        key = sid + "_" + xnm + "_" + xqm  # 存入redis中的键
+        # 查本学年成绩
+        if (int(xnm) == current_year and xqm == "3" and datetime.date(current_year, 11, 1) < current_date <= datetime.date(current_year, 12, 30)) \
+                or (int(xnm) + 1 == current_year and xqm == "3" and datetime.date(current_year, 1, 1) < current_date <= datetime.date(current_year, 3, 1)) \
+                or (int(xnm) + 1 == current_year and xqm != "3" and datetime.date(current_year, 5, 1) < current_date <= datetime.date(current_year, 9, 1)):
             gradeList = await get_grade(s, sid, ip, xnm, xqm)
-            if gradeList:
-                return web.json_response(gradeList)
-            else:
-                return Response(
-                    body=b'', content_type='application/json', status=403)
-        else:
-            print("ppapppapap")
-            key = sid + "_" + xnm + "_" + xqm
             val = redis_client.get(key)
-            if val is not None:
+            if gradeList:
+                # 爬到了数据
+                if val and json.loads(val) != gradeList:
+                    # 成绩有更新，重新设置缓存
+                    redis_client.set(key, json.dumps(gradeList), ex=126144000)  # 过期时间为4年
+                return web.json_response(gradeList)
+            elif val is not None:
+                # 没有爬到数据,并且缓存中有数据，则返回缓存中的数据
+                return web.json_response(json.loads(val))
+
+        else:
+            #查以往学年成绩
+            val = redis_client.get(key)
+            if val is not None:  # 缓存中有存储
                 return web.json_response(json.loads(val))
             else:
-                print("pspsppsppa")
                 gradeList = await get_grade(s, sid, ip, xnm, xqm)
-                print(gradeList)
                 if gradeList:
-                    redis_client.set(
-                        key, json.dumps(gradeList), ex=126144000)  #过期时间为4年
+                    redis_client.set(key, json.dumps(gradeList), ex=126144000)  # 过期时间为4年
                     return web.json_response(gradeList)
                 else:
-                    return Response(
-                        body=b'', content_type='application/json', status=403)
+                    return Response(body=b'', content_type='application/json', status=403)
 
 
 # =================================
