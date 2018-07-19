@@ -16,7 +16,7 @@ docker-compose ps
 ## Log
 
 + 2017年4月29日: 拖了2个月了...ㄟ( ▔, ▔ )ㄏ
-
++ 2018年7月19日: 将缓存从redis变更置mongodb,添加swagger API文档
 
 ## 关于缓存
 ### 基本数据
@@ -33,4 +33,11 @@ docker-compose ps
 
 
 ### 查询以往当前学年的成绩
-用户第一次查询的时候，去学校网站上爬取成绩信息，然后将结果缓存到redis中，之后的查询直接从redis中取数据即可。(以往学年的成绩已经固定，不用考虑更新问题)
+用户第一次查询的时候，去学校网站上爬取成绩信息，然后将结果缓存到mongo中，之后的查询直接从mongo中取数据即可。(以往学年的成绩已经固定，不用考虑更新问题)
+
+## 部署
+### 环境变量
++ MONGO_HOST:MONGO所在主机名，默认locahost
++ MONGO_PORT:MONGO监听端口，默认27017
++ MONGO_ACCOUNT:MONGO用户名，默认None
++ MONGO_PASSWORD:MONGO密码，默认None
