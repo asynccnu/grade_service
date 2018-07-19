@@ -4,7 +4,7 @@ from aiohttp import web
 from aiohttp.web import Response
 from .spider import get_grade
 from .decorator import require_info_login
-from ._redis import redis_client
+from .mongo_init import mongo_collection
 
 api = web.Application()
 
@@ -30,32 +30,28 @@ async def grade_all_api(request, s, sid, ip):
                 or (int(xnm) + 1 == current_year and xqm == "3" and datetime.date(current_year, 1, 1) < current_date <= datetime.date(current_year, 3, 1)) \
                 or (int(xnm) + 1 == current_year and xqm != "3" and datetime.date(current_year, 5, 1) < current_date <= datetime.date(current_year, 9, 1)):
             gradeList = await get_grade(s, sid, ip, xnm, xqm)
-            val = redis_client.get(key)
+            val = mongo_collection.find_one({"key": key})
             if gradeList:
-                # 爬到了数据
-                if val and json.loads(val) != gradeList:
-                    # 成绩有更新，重新设置缓存
-                    redis_client.set(key, json.dumps(gradeList), ex=126144000)  # 过期时间为4年
+                if val and json.loads(val.get("val")) != gradeList:
+                    mongo_collection.insert_one({"key":key,"val":json.dumps(gradeList)})
                 return web.json_response(gradeList)
             elif val is not None:
                 # 没有爬到数据,并且缓存中有数据，则返回缓存中的数据
                 return web.json_response(json.loads(val))
-
         else:
             #查以往学年成绩
-            val = redis_client.get(key)
+            val = mongo_collection.find_one({"key": key})
             if val is not None:  # 缓存中有存储
-                return web.json_response(json.loads(val))
+                return web.json_response(json.loads(val.get('val')))
             else:
                 gradeList = await get_grade(s, sid, ip, xnm, xqm)
                 if gradeList:
-                    redis_client.set(key, json.dumps(gradeList), ex=126144000)  # 过期时间为4年
+                    mongo_collection.insert_one({"key": key, "val": json.dumps(gradeList)})
                     return web.json_response(gradeList)
                 else:
                     return Response(body=b'', content_type='application/json', status=403)
 
 
-# =================================
 
 # ====== url --------- maps  ======
 api.router.add_route('GET', '/grade/', grade_all_api, name='grade_all_api')
