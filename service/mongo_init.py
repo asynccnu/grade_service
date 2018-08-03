@@ -8,7 +8,7 @@ MONGO_ACCOUNT=os.environ.get("MONGO_ACCOUNT") or None
 MONGO_PASSWORD=os.environ.get("MONGO_PASSWORD") or None
 
 
-client = MongoClient(MONGO_HOST, MONGO_PORT)
+client = MongoClient(MONGO_HOST, int(MONGO_PORT))
 
 #连接gradedb数据库,账号密码认证
 db = client.gradedb
