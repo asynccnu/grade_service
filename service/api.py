@@ -49,7 +49,7 @@ async def grade_all_api(request, s, sid, ip):
                     mongo_collection.insert_one({"key": key, "val": json.dumps(gradeList)})
                     return web.json_response(gradeList)
                 else:
-                    return Response(body=b'', content_type='application/json', status=403)
+                    return Response(body=b'', content_type='application/json', status=404)
 
 
 
