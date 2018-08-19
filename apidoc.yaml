@@ -96,6 +96,57 @@ paths:
                   type: integer
                 usual:
                   type: integer
-
+  /grade/another/:
+    get:
+      summary: 获取缓存的成绩数据
+      description: 学校网站改版，请求方式有一些变化
+      produces:
+      - application/json
+      consumes:
+      - application/json
+      parameters:
+      - in: query
+        name: xnm
+        description: 学年，例如请求2017-2018学年成绩，则xnm=2017
+        required: true
+      - in: query
+        name: xqm
+        description: 学期，第一学期 xqm=3, 第二学期 xqm=12, 第三学期 xqm=16
+        required: true
+      - in: header
+        name: Sid
+        description: 学号
+        required: true
+      responses:
+        401:
+          description: 未授权
+        403:
+          description: 禁止访问
+        404:
+          description: 缓存中没有数据
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              properties:
+                course:
+                  type: string
+                credit:
+                  type: string
+                grade:
+                  type: integer
+                category:
+                  type: string
+                type:
+                  type: string
+                jxb_id:
+                  type: integer
+                kcxzmc:
+                  type: string
+                ending:
+                  type: integer
+                usual:
+                  type: integer
 
 
