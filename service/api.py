@@ -58,7 +58,7 @@ async def grade_all_api(request, s, sid, ip):
                 return Response(body=b'', content_type='application/json', status=404)
 
 
-async def grade_all_api_another(request):
+async def grade_all_api_2(request):
     headers = request.headers
     req_headers = dict(headers)
     sid = req_headers.get("Sid")
@@ -75,5 +75,5 @@ async def grade_all_api_another(request):
 
 # ====== url --------- maps  ======
 api.router.add_route('GET', '/grade/', grade_all_api, name='grade_all_api')
-api.router.add_route('GET','/grade/another',grade_all_api_another,name='grade_all_api_another')
+api.router.add_route('GET','/grade/2',grade_all_api_2,name='grade_all_api_2')
 # ==============================
