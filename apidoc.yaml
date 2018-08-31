@@ -96,7 +96,7 @@ paths:
                   type: integer
                 usual:
                   type: integer
-  /grade/another/:
+  /grade/2/:
     get:
       summary: 获取缓存的成绩数据
       description: 学校网站改版，请求方式有一些变化
