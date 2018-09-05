@@ -1,7 +1,7 @@
 # ------ login_api ------
 grade_api:
-    # build: .
-    image: daocloud.io/neo1218/grade_service
+    build: .
+    #image: daocloud.io/neo1218/grade_service
     env_file:
         - container.env
     command: gunicorn wsgi:app -k aiohttp.worker.GunicornWebWorker -b 0.0.0.0:8080 --log-level DEBUG

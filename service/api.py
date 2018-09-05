@@ -5,6 +5,7 @@ from aiohttp.web import Response
 from .spider import get_grade
 from .decorator import require_info_login
 from .mongo_init import mongo_collection
+from jsoncensor import JsonCensor
 
 api = web.Application()
 
@@ -67,13 +68,26 @@ async def grade_all_api_cache(request):
     key = sid + "_" + xnm + "_" + xqm  # 存入mongodb中的键
     val = mongo_collection.find_one({"key": key})
     if val is not None:
-        return web.json_response(json.loads(val))
+        val.pop('_id')
+        return web.json_response(val)
     return Response(body=b'', content_type='application/json', status=404)
 
 
-
+# ios cache
+async def grade_ios_client_cache(request):
+    headers = request.headers
+    req_headers = dict(headers)
+    sid = req_headers.get("Sid")
+    query_string = request.rel_url.query_string
+    xnm, xqm = parseQuertString(query_string)
+    key = sid + "_" + xnm + "_" + xqm
+    json_data = await request.json()
+    mongo_collection.find_one_and_replace({"key": key}, {"key":key,"val":json_data})
+    return Response(body=b'', content_type='application/json', status=201)
+    
 
 # ====== url --------- maps  ======
 api.router.add_route('GET', '/grade/', grade_all_api, name='grade_all_api')
 api.router.add_route('GET','/grade/cache/',grade_all_api_cache,name='grade_all_api_cache')
+api.router.add_route('POST', '/grade/cache/', grade_ios_client_cache, name='grade_ios_client_cache')
 # ==============================
