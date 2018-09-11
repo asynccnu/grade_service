@@ -161,24 +161,7 @@ paths:
         required: true
       - in: body
         schema:
-          type: array
-          items:
-            properties:
-              course:
-                type: string
-              credit:
-                type: string
-              grade:
-                type: integer
-              category:
-                type: string
-              type:
-                type: string
-              jxb_id:
-                type: integer
-              kcxzmc:
-                type: string
-              ending:
-                type: integer
-              usual:
-                type: integer
+          type: object
+          properties:
+            cache_string:
+              type: string

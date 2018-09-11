@@ -82,7 +82,8 @@ async def grade_ios_client_cache(request):
     xnm, xqm = parseQuertString(query_string)
     key = sid + "_" + xnm + "_" + xqm
     json_data = await request.json()
-    mongo_collection.find_one_and_replace({"key": key}, {"key":key,"val":json_data})
+    cache_string = json_data['cache_string']
+    mongo_collection.find_one_and_replace({"key": key}, {"key":key,"val":cache_string}, upsert = True)
     return Response(body=b'', content_type='application/json', status=201)
     
 
