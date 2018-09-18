@@ -25,6 +25,8 @@ def parseQuertString(query_string):
     return "",""
 
 # ====== async view handlers ======
+# 有能从学校处查询的成绩一定使用新成绩
+# 只有在从学校那里拿不到的时候才使用缓存的
 @require_info_login
 async def grade_all_api(request, s, sid, ip):
     current_date = datetime.datetime.now().date()
@@ -39,24 +41,18 @@ async def grade_all_api(request, s, sid, ip):
         gradeList = await get_grade(s, sid, ip, xnm, xqm)
         val = mongo_collection.find_one({"key": key})
         if gradeList:
-            if val and json.loads(val.get("val")) != gradeList:
-                mongo_collection.insert_one({"key":key,"val":json.dumps(gradeList)})
             return web.json_response(gradeList)
         elif val is not None:
             # 没有爬到数据,并且缓存中有数据，则返回缓存中的数据
             return web.json_response(json.loads(val))
     else:
         #查以往学年成绩
-        val = mongo_collection.find_one({"key": key})
-        if val is not None:  # 缓存中有存储
-            return web.json_response(json.loads(val.get('val')))
+        gradeList = await get_grade(s, sid, ip, xnm, xqm)
+        if gradeList:
+            mongo_collection.insert_one({"key": key, "val": json.dumps(gradeList)})
+            return web.json_response(gradeList)
         else:
-            gradeList = await get_grade(s, sid, ip, xnm, xqm)
-            if gradeList:
-                mongo_collection.insert_one({"key": key, "val": json.dumps(gradeList)})
-                return web.json_response(gradeList)
-            else:
-                return Response(body=b'', content_type='application/json', status=404)
+            return Response(body=b'', content_type='application/json', status=404)
 
 
 async def grade_all_api_cache(request):
