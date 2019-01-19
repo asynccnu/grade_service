@@ -25,3 +25,4 @@ six==1.10.0
 wcwidth==0.1.7
 yarl==0.10.1
 jsoncensor==0.0.9
+lxml==3.7.3
