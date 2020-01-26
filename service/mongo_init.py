@@ -6,7 +6,7 @@ MONGO_URI=os.environ.get("MONGO_URI") or "mongodb://username:secret@localhost:27
 
 # client = AsyncIOMotorClient(MONGODB_HOST, MONGODB_PORT)
 mongo_uri = MONGO_URI
-client = AsyncIOMotorClient(mongo_uri)
+client = MongoClient(mongo_uri)
 #连接gradedb数据库,账号密码认证
 db = client.gradedb
 
