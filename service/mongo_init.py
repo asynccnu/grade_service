@@ -10,8 +10,5 @@ client = MongoClient(mongo_uri)
 #连接gradedb数据库,账号密码认证
 db = client.gradedb
 
-if MONGO_ACCOUNT and MONGO_PASSWORD:
-    db.authenticate(MONGO_ACCOUNT, MONGO_PASSWORD)
-
 #集合
 mongo_collection=db.gradeset
